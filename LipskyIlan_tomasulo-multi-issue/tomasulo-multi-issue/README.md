@@ -1,35 +1,40 @@
-# Multi-issue Tomasulo Simulator
+# Tomasulo Simulator with Multi-Issue
 
-A Python simulator of Tomasulo's algorithm with a reorder buffer, register renaming (RAT),
-a load/store queue, a BTB-based branch predictor and speculative execution. It extends the
-provided single-issue simulator to **issue 1–4 instructions per cycle, in program order**.
+This project extends the provided Python simulator of Tomasulo's algorithm, which has a reorder
+buffer, a RAT and a load/store queue, so that it **issues 1–4 instructions per cycle, in program
+order**. It also adds the BTB branch predictor from the handout, with speculative issue and
+misprediction recovery.
 
-Requires **Python 3.6+** and nothing else. The test tools also use only the standard library.
-Rebuilding the report needs `pdflatex` and `matplotlib`.
+The original code structure is kept: the same files, stage functions and data structures. The
+changes are marked with comments in the code. The provided code is in `original_code/` for
+comparison.
+
+**Repository:** https://github.com/CoinismRS/LipskyIlan_COSC6385_Programming_Tomasulo_HW
+
+Requires **Python 3** only. Rebuilding the report also needs `pdflatex` and `matplotlib`.
 
 ## Quick start
 
 ```bash
+git clone https://github.com/CoinismRS/LipskyIlan_COSC6385_Programming_Tomasulo_HW.git
+cd LipskyIlan_COSC6385_Programming_Tomasulo_HW
 cd code
 python3 main.py                                   # runs code.in (the handout example)
 python3 main.py ../tests/test1_loop.txt           # issue width taken from the file
 python3 main.py ../tests/test1_loop.txt -w 4      # override the issue width (1-4)
 python3 main.py ../tests/test2_independent.txt -w 4 --cdb 4   # 4 CDBs
-python3 main.py ../tests/test5_branches.txt -w 2 -v --btb     # cycle trace + final BTB
 ```
 
 | Option | Meaning |
 |---|---|
 | `-w N`, `--width N` | issue width, 1–4 (overrides `Issue width =` in the file) |
 | `--cdb N` | number of CDBs, i.e. results broadcast per cycle (default 1) |
-| `--commit N` | commit width (default: equal to the issue width) |
-| `-v` | print a cycle-by-cycle trace (issue, exec, mem, wb, commit, squash) |
-| `--btb` | print the final BTB contents |
+| `--commit N` | commit width (default: same as the issue width) |
 
 ## Input format
 
-The input file is case-insensitive, and commas between operands are optional. Lines starting
-with `//` or `#` are comments.
+The input file is case-insensitive, and commas between operands are optional. Text after `//`
+is a comment.
 
 ```
                  # of rs   Cycles in EX   Cycles in Mem   # of FUs
@@ -51,82 +56,89 @@ Addi R2, R2, -10
 Bne R2, R3, -4
 ```
 
-* **Supported instructions:** `Ld`, `Sd`, `Beq`, `Bne`, `Add`, `Addi`, `Sub`, `Add.d`,
-  `Sub.d` and `Mult.d`.
-* **Branch offsets** are in instructions (words): the target is `PC + 4 + (offset << 2)`.
-  In the example above, `-4` jumps back to the first line.
-* **Registers:** R0–R31 (R0 is always 0) and F0–F31. All registers start at 0 unless
-  initialized in the file.
-* **Memory:** 256 bytes, using byte addresses 0–255. Use word-aligned addresses.
+* **Instructions:** `Ld`, `Sd`, `Beq`, `Bne`, `Add`, `Addi`, `Sub`, `Add.d`, `Sub.d` and
+  `Mult.d`.
+* **Branch offsets:** given in instructions (words). The target is `PC + 4 + (offset << 2)`,
+  so in the example `-4` jumps back to the first line.
+* **Registers:** R0–R31 and F0–F31. R0 is always 0, and every register starts at 0 unless the
+  file sets it.
+* **Memory:** 256 bytes, with byte addresses 0–255.
+* **"# of FUs" for the load/store unit:** this is the number of address adders. Memory itself
+  is single-ported.
 
 ## Output
 
-The simulator prints the instruction status table (ISSUE, EX, MEM, WB and COMMIT cycles for
-every committed instruction), the values of all registers, the non-zero memory values, and a
-summary: total cycles, IPC, mispredictions and squashed instructions.
+The output has four parts, in the same style as the original simulator:
+
+* the instruction status table, with the ISSUE, EXE, MEM, WB and COMMIT cycles of every
+  committed instruction;
+* all register values;
+* the non-zero memory values;
+* a summary line: total cycles, IPC, mispredictions and squashed instructions.
 
 ```
-                    ISSUE   EX        MEM       WB      COMMIT
-Ld F2, 0(R1)        1       2-2       3-7       8       9
-Mult.d F4, F2, F20  1       9-23      -         24      25
+                              ISSUE          EXE            MEM            WB             COMMIT
+Ld F2 0(R1)                   [1]            [2, 2]         [3, 7]         [9]            [10]
+Mult.d F4 F2 F20              [2]            [10, 24]       []             [25]           [26]
 ...
 REGISTER VALUES
         R0        R1        R2   ...
 value:  0         0         20   ...
 NON-ZERO MEMORY VALUES
-Addresses   Values
-4           3.0
+Addresses      Values
+4              3.0
 ...
 ```
 
-## Processor model in brief
+## What was changed
 
-* **ISSUE:** up to W instructions per cycle, in order. Issue stops at the first instruction
-  that cannot get a ROB entry and an RS/LSQ entry. A branch predicted taken ends the issue
-  group for that cycle.
-* **Branches:** an 8-entry BTB (indexed by PC word address & 7) with a 1-bit predictor per
-  entry; prediction happens at ISSUE and the branch resolves at the end of EX. On a
-  misprediction detected in cycle n, the simulator squashes younger instructions and recovers
-  the RAT, and correct-path fetch starts in cycle n+2.
-* **Functional units:** the integer adder is unpipelined, while the FP adder and FP multiplier
-  are pipelined. Each unit type can have several FUs, and each FU takes the oldest ready
-  instruction.
-* **Loads and stores:** the load/store queue uses a dedicated address adder. A load waits for
-  all older store addresses to be known. It then gets its value by store-to-load forwarding
-  (1 cycle) or from memory (single-ported, non-pipelined). Stores write memory at commit.
-* **WB:** CDB-width results per cycle, oldest first. **COMMIT:** commit-width instructions
-  per cycle, in order.
+* **`issue.py`:** issues up to W instructions per cycle, in order. It stops at the first
+  instruction that cannot get a ROB entry and an RS or load/store-queue entry, and after a
+  branch predicted taken.
+* **`branch.py` (new):**
+  * an 8-entry BTB (index = PC word address & 7) with a 1-bit predictor per entry;
+  * misprediction recovery: it recovers the RAT, clears the wrong-path RS entries and their
+    tags, removes wrong-path work from the FUs, the load/store queue and the CDB, and clears
+    the ROB entries after the branch;
+  * fetch restarts at cycle n+2.
+* **`exe.py`:**
+  * several FUs per type;
+  * oldest-ready-first selection;
+  * pipelined FP units and an unpipelined integer adder;
+  * branches report their outcome to `branch.py`.
+* **`wb.py`:** several CDBs. The RAT update no longer overwrites a younger rename.
+* **`commit.py`:** up to the commit width per cycle; branches get a commit cycle.
+* **`mem.py`:** stores go to memory only as the ROB head, plus forwarding fixes.
+* **`init.py` / `main.py`:** read the configuration from the input file (it was hard-coded)
+  and print the final registers and memory.
 
-## Repository layout
-
-```
-code/      simulator: main.py, init.py, issue.py, exe.py, mem.py, wb.py, commit.py,
-           predictor.py, print_status.py, code.in
-tests/     test benches test0 ... test8 (see the header comment in each file)
-tools/     reference.py (sequential golden model), checks.py, run_tests.py, fuzz.py
-results/   full simulator output of every test at W=1..4 (CDB=1 and CDB=W)
-report/    report.pdf, report.tex, build_report.py (regenerates all tables and figures)
-```
+The report (`report/report.pdf`) shows the original and modified code side by side and lists
+the bugs that were fixed in the provided code.
 
 ## Testing
 
 ```bash
 python3 tools/run_tests.py                     # 9 tests x W=1..4 x {1 CDB, W CDBs}
 python3 tools/run_tests.py --tables results    # also regenerate results/
-python3 tools/fuzz.py 2000                     # random programs/configs vs. golden model
+python3 tools/fuzz.py 2000                     # random programs/configs vs. reference
 python3 report/build_report.py                 # rebuild report.pdf from fresh simulations
 ```
 
-Every run is compared with a sequential interpreter, which must produce the same registers,
-the same memory and the same committed instruction stream. The tests also check the timing
-rules: in-order issue and commit, the width limits, stage ordering and producer→consumer
-timing. All 72 directed runs and 20,000 random runs pass.
+Every run is compared against a sequential interpreter, which must produce the same
+registers, the same memory and the same committed instruction sequence. Each run is also
+checked for:
+
+* in-order issue and commit;
+* the issue, commit and CDB width limits;
+* stage order;
+* operand-ready timing;
+* use of the single memory port.
 
 ## Known limitations
 
-* Loads do not speculate past stores whose addresses are still unknown (conservative memory
-  disambiguation, as in the original code).
-* Each memory address holds one value, as in the original simulator, so unaligned or
-  overlapping word accesses are not modeled.
-* The output table lists committed instructions only. Use `-v` to see the squashed
-  wrong-path instructions.
+* A load never passes a store whose address is still unknown, as in the original code.
+* A store is sent to memory only when it is the oldest instruction in the ROB.
+* Each memory address holds one value, as in the original code, so overlapping word accesses
+  are not modelled.
+* The table lists committed instructions only. Squashed instructions are counted in the
+  summary line.
