@@ -1,0 +1,27 @@
+// Test 5 - Beq/Bne, nested loops, 1-bit prediction and wrong-path squashing.
+// Outer loop runs 3 times, inner loop 2 times per outer iteration.
+// The instructions after each loop are executed speculatively on the wrong path
+// at least once; if squashing were broken R9/F9/Mem[200] would be wrong.
+               # of rs   Cycles in EX   Cycles in Mem   # of FUs
+Integer adder   4          1                             1
+FP adder        4          2                             1
+FP multiplier   2          4                             1
+Load/store unit 4          1             2               1
+
+ROB entries = 32
+Issue width = 1
+R1=3, F1=1.0, F2=0.5
+
+Addi R2, R0, 2
+Add.d F3, F3, F1
+Addi R2, R2, -1
+Bne R2, R0, -3
+Mult.d F4, F3, F2
+Addi R1, R1, -1
+Beq R1, R0, 1
+Beq R0, R0, -8
+Addi R9, R0, 7
+Beq R9, R0, 2
+Add.d F9, F3, F4
+Sd F9, 200(R0)
+Addi R10, R9, 1

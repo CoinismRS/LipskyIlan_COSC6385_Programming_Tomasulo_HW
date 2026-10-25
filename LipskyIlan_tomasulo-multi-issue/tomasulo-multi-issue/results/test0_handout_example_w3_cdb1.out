@@ -1,0 +1,44 @@
+Configuration: issue width=3, commit width=3, CDB width=1, ROB=128
+
+                  ISSUE   EX        MEM       WB      COMMIT  
+Add.d F1, F2, F3  1       2-4       -         5       6       
+Ld F4, 8(R1)      1       2-2       3-6       7       8       
+Addi R2, R2, -10  1       2-2       -         3       8       
+Bne R2, R3, -4    2       4-4       -         -       8       
+Add.d F1, F2, F3  6       7-9       -         10      11      
+Ld F4, 8(R1)      6       7-7       8-11      12      13      
+Addi R2, R2, -10  6       7-7       -         8       13      
+Bne R2, R3, -4    7       9-9       -         -       13      
+
+REGISTER VALUES
+        R0        R1        R2        R3        R4        R5        R6        R7
+value:  0         10        0         0         0         0         0         0
+        R8        R9        R10       R11       R12       R13       R14       R15
+value:  0         0         0         0         0         0         0         0
+        R16       R17       R18       R19       R20       R21       R22       R23
+value:  0         0         0         0         0         0         0         0
+        R24       R25       R26       R27       R28       R29       R30       R31
+value:  0         0         0         0         0         0         0         0
+        F0        F1        F2        F3        F4        F5        F6        F7
+value:  0.0       30.1      30.1      0.0       0.0       0.0       0.0       0.0
+        F8        F9        F10       F11       F12       F13       F14       F15
+value:  0.0       0.0       0.0       0.0       0.0       0.0       0.0       0.0
+        F16       F17       F18       F19       F20       F21       F22       F23
+value:  0.0       0.0       0.0       0.0       0.0       0.0       0.0       0.0
+        F24       F25       F26       F27       F28       F29       F30       F31
+value:  0.0       0.0       0.0       0.0       0.0       0.0       0.0       0.0
+
+NON-ZERO MEMORY VALUES
+Addresses   Values
+4           1
+8           2
+12          3.4
+
+SUMMARY
+  total cycles            : 13
+  instructions committed  : 8
+  IPC                     : 0.615
+  instructions issued     : 11 (squashed 3)
+  branches issued         : 2, mispredicted 2
+  final BTB contents:
+  BTB[3]: PC=12 target=0 bit=NT

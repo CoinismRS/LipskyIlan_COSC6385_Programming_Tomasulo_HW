@@ -1,0 +1,16 @@
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Instruction & ISSUE & EX & MEM & WB & COMMIT\\\midrule
+\texttt{Mult.d F3, F1, F2} & 1 & 2--7 & -- & 8 & 9 \\
+\texttt{Sd F3, 0(R1)} & 1 & 2--2 & 9--12 & -- & 9 \\
+\texttt{Ld F4, 0(R1)} & 2 & 3--3 & 9--9 & 10 & 11 \\
+\texttt{Ld F5, 8(R1)} & 2 & 4--4 & 5--8 & 9 & 11 \\
+\texttt{Add.d F6, F4, F5} & 3 & 11--12 & -- & 13 & 14 \\
+\texttt{Sd F6, 8(R2)} & 3 & 5--5 & 14--17 & -- & 14 \\
+\texttt{Sd F1, 8(R2)} & 4 & 6--6 & 18--21 & -- & 18 \\
+\texttt{Ld F7, 24(R0)} & 4 & 7--7 & 8--8 & 11 & 18 \\
+\texttt{Add R4, R1, R2} & 5 & 6--6 & -- & 7 & 19 \\
+\texttt{Sd F7, 16(R4)} & 8 & 9--9 & 22--25 & -- & 22 \\
+\texttt{Ld F8, 40(R0)} & 8 & 10--10 & 12--12 & 14 & 22 \\
+\texttt{Ld F9, 0(R3)} & 9 & 11--11 & 12--12 & 15 & 23 \\
+\texttt{Add.d F10, F8, F9} & 9 & 16--17 & -- & 18 & 23 \\
+\bottomrule\end{tabular}

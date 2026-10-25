@@ -1,0 +1,49 @@
+Configuration: issue width=3, commit width=3, CDB width=1, ROB=32
+
+                    ISSUE   EX        MEM       WB      COMMIT  
+Add R10, R1, R2     1       2-2       -         3       4       
+Add.d F10, F1, F2   1       2-3       -         4       5       
+Sub R11, R3, R4     1       2-2       -         5       6       
+Mult.d F11, F3, F4  2       3-6       -         7       8       
+Addi R12, R5, 100   2       3-3       -         6       8       
+Sub.d F12, F5, F6   2       3-4       -         8       9       
+Add R13, R6, R1     3       4-4       -         9       10      
+Add.d F13, F2, F3   3       4-5       -         10      11      
+Sub R14, R2, R5     3       4-4       -         11      12      
+Mult.d F14, F5, F6  4       5-8       -         12      13      
+Addi R15, R3, -7    4       5-5       -         13      14      
+Sub.d F15, F1, F4   4       5-6       -         14      15      
+Add R16, R4, R6     5       6-6       -         15      16      
+Add.d F16, F4, F5   5       6-7       -         16      17      
+Addi R17, R1, 42    5       6-6       -         17      18      
+Mult.d F17, F1, F6  6       7-10      -         18      19      
+
+REGISTER VALUES
+        R0        R1        R2        R3        R4        R5        R6        R7
+value:  0         1         2         3         4         5         6         0
+        R8        R9        R10       R11       R12       R13       R14       R15
+value:  0         0         3         -1        105       7         -3        -4
+        R16       R17       R18       R19       R20       R21       R22       R23
+value:  10        43        0         0         0         0         0         0
+        R24       R25       R26       R27       R28       R29       R30       R31
+value:  0         0         0         0         0         0         0         0
+        F0        F1        F2        F3        F4        F5        F6        F7
+value:  0.0       1.5       2.5       3.5       4.5       5.5       6.5       0.0
+        F8        F9        F10       F11       F12       F13       F14       F15
+value:  0.0       0.0       4.0       15.75     -1.0      6.0       35.75     -3.0
+        F16       F17       F18       F19       F20       F21       F22       F23
+value:  10.0      9.75      0.0       0.0       0.0       0.0       0.0       0.0
+        F24       F25       F26       F27       F28       F29       F30       F31
+value:  0.0       0.0       0.0       0.0       0.0       0.0       0.0       0.0
+
+NON-ZERO MEMORY VALUES
+Addresses   Values
+
+SUMMARY
+  total cycles            : 19
+  instructions committed  : 16
+  IPC                     : 0.842
+  instructions issued     : 16 (squashed 0)
+  branches issued         : 0, mispredicted 0
+  final BTB contents:
+  (empty)

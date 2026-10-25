@@ -1,0 +1,29 @@
+// Test 8 - "Test Case #02" from the sample report (multiple FUs per class).
+               # of rs   Cycles in EX   Cycles in Mem   # of FUs
+Integer adder   4          1                             1
+FP adder        3          3                             2
+FP multiplier   2          15                            2
+Load/store unit 4          1             5               2
+
+ROB entries = 128
+Issue width = 1
+R1=12, R2=32, F20=3.0
+Mem[4]=3.0, Mem[8]=2.0, Mem[12]=1.0, Mem[24]=6.0, Mem[28]=5.0, Mem[32]=4.0
+
+Ld F1, 0(R1)
+Mult.d F2, F1, F0
+Add.d F3, F3, F2
+Mult.d F2, F1, F1
+Ld F1, 0(R1)
+Addi R1, R1, 4
+Add.d F4, F2, F4
+Addi R1, R1, 8
+Ld F1, 0(R1)
+Mult.d F2, F1, F0
+Add.d F3, F3, F2
+Mult.d F2, F1, F1
+Ld F1, 0(R1)
+Mult.d F2, F1, F0
+Add.d F3, F3, F2
+Mult.d F2, F1, F1
+Add.d F4, F2, F4

@@ -1,0 +1,11 @@
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Instruction & ISSUE & EX & MEM & WB & COMMIT\\\midrule
+\texttt{Add.d F1, F2, F3} & 1 & 2--4 & -- & 5 & 6 \\
+\texttt{Ld F4, 8(R1)} & 1 & 2--2 & 3--6 & 7 & 8 \\
+\texttt{Addi R2, R2, -10} & 2 & 3--3 & -- & 4 & 8 \\
+\texttt{Bne R2, R3, -4} & 2 & 5--5 & -- & -- & 9 \\
+\texttt{Add.d F1, F2, F3} & 7 & 8--10 & -- & 11 & 12 \\
+\texttt{Ld F4, 8(R1)} & 7 & 8--8 & 9--12 & 13 & 14 \\
+\texttt{Addi R2, R2, -10} & 8 & 9--9 & -- & 10 & 14 \\
+\texttt{Bne R2, R3, -4} & 8 & 11--11 & -- & -- & 15 \\
+\bottomrule\end{tabular}

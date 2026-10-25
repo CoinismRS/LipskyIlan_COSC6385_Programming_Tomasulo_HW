@@ -1,0 +1,29 @@
+// Test 4 - load/store queue and memory disambiguation.
+//  * Sd then Ld to the same address  -> store-to-load forwarding (1-cycle MEM)
+//  * Ld behind a Sd whose address depends on a long FP chain -> must wait
+//  * Ld to a different address than an older Sd -> goes to memory
+//  * two stores to the same address -> last one wins (in-order commit)
+               # of rs   Cycles in EX   Cycles in Mem   # of FUs
+Integer adder   4          1                             1
+FP adder        4          2                             1
+FP multiplier   4          6                             1
+Load/store unit 6          1             4               1
+
+ROB entries = 32
+Issue width = 1
+R1=8, R2=16, R3=40, F1=1.5, F2=2.0
+Mem[8]=10.0, Mem[16]=20.0, Mem[24]=30.0, Mem[40]=99.0
+
+Mult.d F3, F1, F2
+Sd F3, 0(R1)
+Ld F4, 0(R1)
+Ld F5, 8(R1)
+Add.d F6, F4, F5
+Sd F6, 8(R2)
+Sd F1, 8(R2)
+Ld F7, 24(R0)
+Add R4, R1, R2
+Sd F7, 16(R4)
+Ld F8, 40(R0)
+Ld F9, 0(R3)
+Add.d F10, F8, F9

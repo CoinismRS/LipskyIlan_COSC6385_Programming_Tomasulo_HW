@@ -1,0 +1,28 @@
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Instruction & ISSUE & EX & MEM & WB & COMMIT\\\midrule
+\texttt{Ld F2, 0(R1)} & 1 & 2--2 & 3--7 & 8 & 9 \\
+\texttt{Mult.d F4, F2, F20} & 2 & 9--23 & -- & 24 & 25 \\
+\texttt{Ld F6, 0(R2)} & 3 & 4--4 & 8--12 & 13 & 26 \\
+\texttt{Add.d F6, F4, F6} & 4 & 25--28 & -- & 29 & 30 \\
+\texttt{Sd F6, 0(R2)} & 5 & 6--6 & 34--38 & -- & 34 \\
+\texttt{Addi R1, R1, -4} & 6 & 7--7 & -- & 9 & 35 \\
+\texttt{Addi R2, R2, -4} & 7 & 8--8 & -- & 10 & 36 \\
+\texttt{Bne R1, R0, -8} & 8 & 10--10 & -- & -- & 37 \\
+\texttt{Ld F2, 0(R1)} & 12 & 13--13 & 14--18 & 19 & 38 \\
+\texttt{Mult.d F4, F2, F20} & 13 & 20--34 & -- & 35 & 39 \\
+\texttt{Ld F6, 0(R2)} & 14 & 15--15 & 19--23 & 25 & 40 \\
+\texttt{Add.d F6, F4, F6} & 15 & 36--39 & -- & 40 & 41 \\
+\texttt{Sd F6, 0(R2)} & 16 & 17--17 & 42--46 & -- & 42 \\
+\texttt{Addi R1, R1, -4} & 17 & 18--18 & -- & 20 & 43 \\
+\texttt{Addi R2, R2, -4} & 18 & 19--19 & -- & 21 & 44 \\
+\texttt{Bne R1, R0, -8} & 19 & 21--21 & -- & -- & 45 \\
+\texttt{Ld F2, 0(R1)} & 20 & 21--21 & 24--28 & 30 & 46 \\
+\texttt{Mult.d F4, F2, F20} & 21 & 31--45 & -- & 46 & 47 \\
+\texttt{Ld F6, 0(R2)} & 22 & 23--23 & 29--33 & 34 & 48 \\
+\texttt{Add.d F6, F4, F6} & 23 & 47--50 & -- & 51 & 52 \\
+\texttt{Sd F6, 0(R2)} & 24 & 25--25 & 53--57 & -- & 53 \\
+\texttt{Addi R1, R1, -4} & 25 & 26--26 & -- & 27 & 54 \\
+\texttt{Addi R2, R2, -4} & 26 & 27--27 & -- & 28 & 55 \\
+\texttt{Bne R1, R0, -8} & 27 & 28--28 & -- & -- & 56 \\
+\texttt{Add.d F20, F2, F2} & 30 & 31--34 & -- & 36 & 57 \\
+\bottomrule\end{tabular}
